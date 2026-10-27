@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Automated Game Test Suite</title>
+</head>
+<body>
+  <h1>Game Engine & Flow Test Runner</h1>
+  <div id="results">Running tests...</div>
+
+  <div id="hidden-dom" style="display:none;">
+    <div id="view-title-screen"></div>
+    <div id="view-main-game"></div>
+    <div id="view-campaign-ending"></div>
+    <div id="topbar-mission-name"></div>
+    <div id="topbar-rank-badge"></div>
+    <div id="topbar-budget-amount"></div>
+    <div id="topbar-score-badge"></div>
+    <div id="city-map-canvas"></div>
+    <div id="map-live-status-bar"></div>
+    <div id="inspect-view-content"></div>
+    <div id="routes-view-content"></div>
+    <div id="evidence-view-content"></div>
+    <div id="upgrades-view-content"></div>
+    <div id="journal-view-content"></div>
+    <div id="sdg-view-content"></div>
+    <div id="navigator-view-content"></div>
+    <div id="hazards-view-content"></div>
+    <div id="right-context-panel"></div>
+    <div id="campaign-ending-content"></div>
+    <div id="toast-container"></div>
+    <div id="btn-top-sos"></div>
+    <div id="modal-tutorial" class="modal-container hidden"></div>
+    <div id="modal-settings" class="modal-container hidden"></div>
+    <div id="modal-clue-detail" class="modal-container hidden"><span id="modal-clue-category"></span><h3 id="modal-clue-title"></h3><span id="modal-clue-location"></span><p id="modal-clue-body"></p><span id="modal-clue-relevance"></span><button id="btn-clue-to-evidence"></button></div>
+    <div id="modal-mission-debrief" class="modal-container hidden"><span id="debrief-mission-title"></span><span id="debrief-total-score"></span><span id="debrief-tier-badge"></span><span id="score-investigation"></span><span id="score-route"></span><span id="score-response"></span><span id="score-upgrades"></span><span id="score-budget"></span><span id="debrief-reward-text"></span><button id="btn-next-mission"></button></div>
+    <div id="modal-reset-confirm" class="modal-container hidden"></div>
+    <div id="modal-sdg" class="modal-container hidden"></div>
+    <div id="modal-sos-dispatch" class="modal-container hidden">
+      <div id="sos-countdown-view"></div>
+      <div id="sos-countdown-timer"></div>
+      <div id="sos-countdown-sec"></div>
+      <div id="sos-active-view" class="hidden"></div>
+      <span id="sos-dispatch-timestamp"></span>
+      <span id="sos-telemetry-loc"></span>
+      <span id="sos-siren-status-text"></span>
+      <div id="sos-safe-havens-list"></div>
+      <button id="btn-sos-abort"></button>
+      <button id="btn-sos-siren-toggle"></button>
+      <button id="btn-sos-covert-toggle"></button>
+      <button id="btn-sos-cancel-active"></button>
+    </div>
+    <div id="modal-report-hazard" class="modal-container hidden">
+      <select id="hazard-form-location"></select>
+      <select id="hazard-form-category"></select>
+      <select id="hazard-form-severity"></select>
+      <input id="hazard-form-title">
+      <textarea id="hazard-form-desc"></textarea>
+      <input type="checkbox" id="hazard-form-anon">
+      <button id="btn-submit-hazard-report"></button>
+    </div>
+    <div id="covert-stealth-screen" class="hidden">
+      <button id="btn-covert-exit"></button>
+      <div id="covert-tap-zone"></div>
+    </div>
+    <div id="modal-demo-tour" class="modal-container hidden">
+      <span id="demo-step-badge"></span>
+      <h3 id="modal-demo-title"></h3>
+      <div id="demo-step-content"></div>
+      <button id="btn-demo-prev"></button>
+      <button id="btn-demo-next"></button>
+      <button id="btn-demo-auto-exec"></button>
+    </div>
+  </div>
+
+  <script src="audio.js"></script>
+  <script src="gameData.js"></script>
+  <script src="gameEngine.js"></script>
+  <script src="app.js"></script>
+
+  <script>
+    const logs = [];
+    let passCount = 0;
+    let failCount = 0;
+
+    function assert(condition, message) {
+      if (condition) {
+        passCount++;
+        logs.push(`[PASS] ${message}`);
+      } else {
+        failCount++;
+        logs.push(`[FAIL] ${message}`);
+      }
+    }
+
+    try {
+      // TEST 1: Initial Game Data
+      assert(GAME_DATA.missions.length === 3, "GAME_DATA contains exactly 3 campaign missions.");
+      assert(GAME_DATA.locations.length === 10, "GAME_DATA contains 10 interactive Aurelia City locations.");
+      assert(GAME_DATA.upgrades.length === 6, "GAME_DATA contains 6 municipal infrastructure upgrades.");
+      assert(GAME_DATA.initialBudget === 500, "Initial budget is 500 credits.");
+
+      // TEST 2: Game Engine Defaults & Reset
+      gameEngine.resetProgress();
+      assert(gameEngine.state.budget === 500, "Clean state budget is 500.");
+      assert(gameEngine.state.currentMissionIdx === 0, "Current mission index is 0 (Mission 1).");
+      assert(gameEngine.state.discoveredClues.length === 0, "No clues discovered initially.");
+      assert(gameEngine.getCurrentMission().title === "The Last Bus", "Mission 1 title matches 'The Last Bus'.");
+
+      // TEST 3: Mission 1 Clue Collection
+      const m1 = gameEngine.getCurrentMission();
+      const m1_clues = m1.clues;
+      assert(m1_clues.length === 5, "Mission 1 has 5 clues.");
+      m1_clues.forEach(c => gameEngine.discoverClue(c.id));
+      assert(gameEngine.getDiscoveredCluesForMission(m1.id).length === 5, "All 5 Mission 1 clues collected.");
+      
+      // Duplicate clue check (prevent double discovery)
+      const duplicateRes = gameEngine.discoverClue(m1_clues[0].id);
+      assert(duplicateRes === false, "Duplicate clue discovery rejected.");
+
+      // TEST 4: Deduction Validation
+      // Correct deduction requires specific clues
+      const deductionRes = gameEngine.submitDeduction(m1.id, "correct", ["m1_clue_lamp", "m1_clue_schedule", "m1_clue_ticket"]);
+      assert(deductionRes.success === true, "Deduction submission succeeded.");
+      assert(deductionRes.isCorrect === true, "Accurate deduction recognized.");
+      assert(deductionRes.score === 25, "Deduction awards full 25 points.");
+
+      // Incomplete deduction with missing clues
+      const incompleteRes = gameEngine.submitDeduction(m1.id, "correct", ["m1_clue_lamp"]);
+      assert(incompleteRes.success === false, "Deduction without required clues rejected.");
+
+      // TEST 4B: Deduction Revision Capability
+      delete gameEngine.state.completedDeductions[m1.id];
+      assert(!gameEngine.state.completedDeductions[m1.id], "Deduction can be unlocked and cleared for revision.");
+      const reSub = gameEngine.submitDeduction(m1.id, "correct", ["m1_clue_lamp", "m1_clue_schedule", "m1_clue_ticket"]);
+      assert(reSub.isCorrect === true, "Deduction successfully re-solved following revision.");
+
+      // TEST 5: Dialogue Choice & Impact Tag
+      const dialogueChoice = gameEngine.makeDialogueChoice(m1.id, "bystander_safe_checkin");
+      assert(dialogueChoice !== null, "Dialogue choice recorded.");
+      assert(dialogueChoice.points === 20, "Safe bystander choice awarded 20 points.");
+      assert(gameEngine.state.cityRemembers.bystanderApproach === "bystander_safe_checkin", "The City Remembers bystander choice.");
+
+      // TEST 6: Route Planning Selection
+      gameEngine.selectRoute(m1.id, "route_1_avenue");
+      assert(gameEngine.state.selectedRoutes[m1.id] === "route_1_avenue", "Route B (Avenue) selected for Mission 1.");
+
+      // TEST 7: Upgrades & Budget Engine
+      const upgResult = gameEngine.purchaseUpgrade("repair_streetlights"); // 100 CR
+      assert(upgResult.success === true, "Streetlight upgrade purchased.");
+      assert(gameEngine.state.budget === 400, "Budget correctly reduced to 400 CR (500 - 100).");
+      assert(gameEngine.isUpgradePurchased("repair_streetlights") === true, "Streetlights marked as purchased.");
+      assert(gameEngine.state.cityRemembers.streetlightsRepaired === true, "The City Remembers streetlights are repaired.");
+
+      // Duplicate upgrade purchase prevention
+      const dupUpg = gameEngine.purchaseUpgrade("repair_streetlights");
+      assert(dupUpg.success === false, "Duplicate purchase correctly blocked.");
+      assert(gameEngine.state.budget === 400, "Budget unchanged after blocked duplicate purchase.");
+
+      // Purchase another upgrade
+      gameEngine.purchaseUpgrade("update_bus_stop_info"); // 80 CR
+      assert(gameEngine.state.budget === 320, "Budget reduced to 320 CR (400 - 80).");
+
+      // TEST 8: Mission 1 Completion & Scoring
+      const m1_score = gameEngine.completeMission(m1.id);
+      assert(m1_score.total >= 90, `Mission 1 total score is ${m1_score.total} (Threshold >= 90 for City Changemaker).`);
+      assert(m1_score.tier === "CITY CHANGEMAKER", `Tier is ${m1_score.tier}.`);
+      assert(gameEngine.state.completedMissions.includes("mission_1"), "Mission 1 registered as completed.");
+      // Check reward credits (180 CR)
+      assert(gameEngine.state.budget === 500, `Budget increased with completion reward: 320 + 180 = ${gameEngine.state.budget} CR.`);
+
+      // Duplicate mission completion prevention
+      const dupComplete = gameEngine.completeMission(m1.id);
+      assert(gameEngine.state.budget === 500, "Duplicate completion reward blocked (budget stays 500).");
+
+      // TEST 9: Advance to Mission 2
+      const advanced = gameEngine.advanceToNextMission();
+      assert(advanced === true, "Advanced to Mission 2.");
+      assert(gameEngine.state.currentMissionIdx === 1, "Mission index is 1.");
+      const m2 = gameEngine.getCurrentMission();
+      assert(m2.title === "The Silent Report", "Mission 2 title is 'The Silent Report'.");
+
+      // Mission 2 Flow
+      m2.clues.forEach(c => gameEngine.discoverClue(c.id));
+      gameEngine.submitDeduction(m2.id, "correct", ["m2_clue_redacted", "m2_clue_advocate_log", "m2_clue_leena_testimony"]);
+      gameEngine.makeDialogueChoice(m2.id, "systemic_reform");
+      gameEngine.selectRoute(m2.id, "route_2_civic_way");
+      gameEngine.purchaseUpgrade("improve_complaint_procedures"); // 140 CR
+      gameEngine.purchaseUpgrade("community_help_point"); // 120 CR
+      assert(gameEngine.state.budget === 240, `Budget after M2 upgrades: 500 - 260 = ${gameEngine.state.budget} CR.`);
+      const m2_score = gameEngine.completeMission(m2.id);
+      assert(m2_score.total >= 90, `Mission 2 score is ${m2_score.total}.`);
+      assert(gameEngine.state.budget === 440, `Budget with M2 reward: 240 + 200 = ${gameEngine.state.budget} CR.`);
+
+      // TEST 10: Advance to Mission 3
+      gameEngine.advanceToNextMission();
+      assert(gameEngine.state.currentMissionIdx === 2, "Mission index is 2 (Mission 3).");
+      const m3 = gameEngine.getCurrentMission();
+      assert(m3.title === "The Dark Crossing", "Mission 3 title is 'The Dark Crossing'.");
+
+      // Mission 3 Flow
+      m3.clues.forEach(c => gameEngine.discoverClue(c.id));
+      gameEngine.submitDeduction(m3.id, "correct", ["m3_clue_curb", "m3_clue_signal_timer", "m3_clue_audio_chirper"]);
+      gameEngine.makeDialogueChoice(m3.id, "universal_curb_cut");
+      gameEngine.purchaseUpgrade("improve_pedestrian_crossing"); // 150 CR
+      gameEngine.purchaseUpgrade("improve_bus_accessibility"); // 120 CR
+      gameEngine.selectRoute(m3.id, "route_3_grand_crossing"); // Direct crossing, now gold standard!
+      assert(gameEngine.state.budget === 170, `Budget after M3 upgrades: 440 - 270 = ${gameEngine.state.budget} CR.`);
+      const m3_score = gameEngine.completeMission(m3.id);
+      assert(m3_score.total >= 90, `Mission 3 score is ${m3_score.total}.`);
+      assert(gameEngine.state.budget === 390, `Budget with M3 reward: 170 + 220 = ${gameEngine.state.budget} CR.`);
+
+      // TEST 11: Budget Deficit Prevention
+      // Try purchasing an upgrade with insufficient funds (simulate high cost)
+      gameEngine.state.budget = 50;
+      const overspendResult = gameEngine.purchaseUpgrade("repair_streetlights"); // Already bought, but let's test a hypothetical unbought one
+      // Reset unbought test
+      gameEngine.state.purchasedUpgrades = [];
+      const poorResult = gameEngine.purchaseUpgrade("improve_pedestrian_crossing"); // 150 CR, but budget is 50
+      assert(poorResult.success === false, "Purchase with insufficient credits blocked.");
+      assert(gameEngine.state.budget === 50, "Budget not decremented when funds insufficient.");
+
+      // TEST 12: Campaign Finale Generation
+      gameEngine.state.purchasedUpgrades = ["repair_streetlights", "update_bus_stop_info", "improve_complaint_procedures", "community_help_point", "improve_pedestrian_crossing", "improve_bus_accessibility"];
+      const campaignSummary = gameEngine.generateCampaignSummary();
+      assert(campaignSummary.totalScore >= 270, `Total campaign score is ${campaignSummary.totalScore}.`);
+      assert(campaignSummary.verdict.title === "Aurelia's Master Changemaker", `Verdict title is ${campaignSummary.verdict.title}.`);
+      assert(campaignSummary.missionsCompleted === 3, "All 3 missions registered as completed.");
+      assert(campaignSummary.upgradesCompleted === 6, "All 6 municipal improvements registered.");
+
+      // TEST 13: LocalStorage Persistence
+      gameEngine.saveState();
+      const loadEngine = new GameEngine();
+      const loaded = loadEngine.loadState();
+      assert(loaded === true, "Game state loaded from localStorage successfully.");
+      assert(loadEngine.state.completedMissions.length === 3, "Loaded state contains 3 completed missions.");
+      assert(loadEngine.getTotalScore() === gameEngine.getTotalScore(), "Loaded state total score matches saved score.");
+
+      // TEST 14: Rank Calculation
+      const rank = gameEngine.getInvestigatorRank();
+      assert(rank.level === 3, `Rank level is ${rank.level} (${rank.title}).`);
+      assert(rank.title === "Chief Civic Changemaker", "Rank title is 'Chief Civic Changemaker'.");
+
+      // TEST 15: Demo Tour Controller
+      assert(typeof DemoTour === 'object', "DemoTour controller defined.");
+      assert(DemoTour.steps.length === 6, "DemoTour features 6 guided showcase steps.");
+      DemoTour.showStep(0);
+      assert(DemoTour.currentStep === 0, "DemoTour initializes at Step 0.");
+
+      // TEST 16: Dynamic Safety Rating Calculation
+      const safeScore = gameEngine.calculateSafetyRating('univ_campus', 'community_center', 'safest');
+      const fastScore = gameEngine.calculateSafetyRating('univ_campus', 'community_center', 'fastest');
+      const shortcutScore = gameEngine.calculateSafetyRating('univ_campus', 'community_center', 'shortcut');
+      assert(safeScore > fastScore, `Safest route score (${safeScore}) is higher than fastest route (${fastScore}).`);
+      assert(fastScore > shortcutScore, `Fastest route score (${fastScore}) is higher than shortcut route (${shortcutScore}).`);
+      assert(safeScore >= 18 && safeScore <= 99, `Calculated safety score (${safeScore}%) is within bounded range [18, 99].`);
+
+      // TEST 17: Crowdsourced Hazards Reporting & Upvoting
+      const initialHazards = gameEngine.getAllHazards();
+      assert(initialHazards.length >= 6, `Initial crowdsourced hazard feed contains ${initialHazards.length} reports.`);
+      const testHaz = initialHazards[0];
+      const initialUpvotes = testHaz.effectiveUpvotes;
+      const upvoteResult = gameEngine.upvoteHazard(testHaz.id);
+      assert(upvoteResult === true, "Upvoting toggles hazard to upvoted status.");
+      const updatedHazards = gameEngine.getAllHazards();
+      const updatedHaz = updatedHazards.find(h => h.id === testHaz.id);
+      assert(updatedHaz.effectiveUpvotes === initialUpvotes + 1, `Effective upvotes increased from ${initialUpvotes} to ${updatedHaz.effectiveUpvotes}.`);
+
+      // Custom hazard report
+      const customReport = gameEngine.reportCustomHazard({
+        locationId: 'north_crossing',
+        category: 'unlit_corridor',
+        title: 'Flickering High-Pressure Sodium Lamp',
+        description: 'Lamp shuts off completely every 4 minutes leaving crossing dark.',
+        severity: 'high',
+        isAnonymous: true
+      });
+      assert(customReport.id.startsWith('custom_'), `Custom hazard created with ID ${customReport.id}.`);
+      assert(customReport.reportedBy === "Anonymous Resident", "Anonymous reporter identity preserved.");
+      const withCustom = gameEngine.getAllHazards();
+      assert(withCustom[0].id === customReport.id, "Custom hazard report immediately prepended to community feed.");
+
+      // TEST 18: Safe Havens Proximity & SOS Dispatch Engine
+      assert(GAME_DATA.safeHavens.length === 4, "GAME_DATA includes 4 verified 24/7 Safe Havens across Aurelia City.");
+      const havens = gameEngine.getNearestSafeHavens('univ_campus');
+      assert(havens.length === 4, "4 safe havens returned for location query.");
+      assert(havens[0].distanceMeters <= havens[1].distanceMeters, `Nearest safe haven (${havens[0].name}, ${havens[0].distanceMeters}m) sorted closest.`);
+      assert(havens[0].walkMins >= 1, `Walk time calculated: ~${havens[0].walkMins} min.`);
+
+      // SOS Trigger & Cancellation
+      const sosDispatch = gameEngine.triggerSOS('univ_campus');
+      assert(gameEngine.state.sosState.isTriggered === true, "SOS state is marked as triggered.");
+      assert(sosDispatch.dispatchedTime !== undefined, `SOS telemetry recorded dispatched timestamp: ${sosDispatch.dispatchedTime}`);
+      assert(sosDispatch.nearestHavens.length === 4, "SOS returns all nearby safe haven walk-in options.");
+      gameEngine.cancelSOS();
+      assert(gameEngine.state.sosState.isTriggered === false, "SOS cancelled safely by user.");
+
+    } catch (err) {
+      failCount++;
+      logs.push(`[FATAL ERROR] Exception thrown: ${err.message}\n${err.stack}`);
+    }
+
+    const summaryHtml = `
+      <h2>Test Results: ${passCount} Passed, ${failCount} Failed</h2>
+      <ul>${logs.map(l => `<li style="color:${l.startsWith('[PASS]') ? 'green' : 'red'};">${l}</li>`).join('')}</ul>
+    `;
+    document.getElementById('results').innerHTML = summaryHtml;
+  </script>
+</body>
+</html>

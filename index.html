@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HER SAFE ROUTE: THE SILENT SIGNAL | Social Impact Detective-Strategy Game</title>
+  <meta name="description" content="A detective-strategy browser game about women's safety, public infrastructure, and collective civic responsibility for the Girls Who Code HHS Hackathon 2026.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- =========================================================================
+       1. CINEMATIC TITLE SCREEN
+       ========================================================================= -->
+  <div id="view-title-screen" class="title-screen-container">
+    <div class="title-screen-backdrop" aria-hidden="true"></div>
+    <div class="title-glow-sphere" aria-hidden="true"></div>
+
+    <main class="title-content-card">
+      <div class="hackathon-badge">Girls Who Code HHS Hackathon 2026 • Social Impact</div>
+      <h1 class="title-hero-title">HER SAFE ROUTE<br><span style="font-size: 0.65em; letter-spacing: 0.08em; color: var(--accent-secondary);">THE SILENT SIGNAL</span></h1>
+      
+      <p class="title-subtitle">"Every street tells a story. Every decision can change a city."</p>
+      
+      <p class="title-synopsis">
+        Aurelia City needs your help. Take on the role of <strong>Nova</strong>, a community safety investigator. Uncover the institutional neglect behind broken streetlights, ghost bus schedules, and impassable pedestrian crossings. Redesign public infrastructure and prove that community safety is a shared civic responsibility.
+      </p>
+
+      <div class="title-cta-group">
+        <button id="btn-start-game" class="btn btn-primary btn-lg" autofocus>
+          <span class="icon">🔍</span> Start Investigation
+        </button>
+        <button id="btn-live-demo" class="btn btn-success btn-lg">
+          <span class="icon">🎬</span> Interactive Demo Tour
+        </button>
+        <button id="btn-continue-game" class="btn btn-secondary btn-lg btn-disabled" disabled>
+          <span class="icon">▶</span> Continue Mission
+        </button>
+      </div>
+
+      <div class="title-secondary-ctas">
+        <button id="btn-how-to-play" class="btn btn-outline btn-sm">
+          📖 Field Guide & Tutorial
+        </button>
+        <button id="btn-settings-title" class="btn btn-outline btn-sm">
+          ⚙️ Accessibility & Audio
+        </button>
+        <button id="btn-sdg-title" class="btn btn-outline btn-sm">
+          🌐 UN SDGs & Mission
+        </button>
+      </div>
+    </main>
+  </div>
+
+  <!-- =========================================================================
+       2. MAIN GAME SCREEN
+       ========================================================================= -->
+  <div id="view-main-game" class="hidden">
+    
+    <!-- Top Navigation Bar -->
+    <header class="topbar" role="banner">
+      <div class="topbar-left">
+        <a href="#" class="game-brand" onclick="App.switchScreen('title'); return false;" aria-label="Her Safe Route Home">
+          <span class="brand-icon">🛡️</span>
+          <div>
+            <div class="brand-name">HER SAFE ROUTE</div>
+            <span class="brand-tag">The Silent Signal</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="topbar-center">
+        <!-- Current Mission Badge -->
+        <div class="topbar-metric-box">
+          <span class="metric-label-micro">Active Mission</span>
+          <span id="topbar-mission-name" class="metric-value-highlight">Loading...</span>
+        </div>
+
+        <!-- Investigator Rank -->
+        <div class="topbar-metric-box">
+          <span class="metric-label-micro">Investigator Rank</span>
+          <span id="topbar-rank-badge" class="metric-value-highlight">Junior Investigator</span>
+        </div>
+
+        <!-- Municipal Budget -->
+        <div class="topbar-metric-box">
+          <span class="metric-label-micro">Municipal Budget</span>
+          <span id="topbar-budget-amount" class="metric-value-highlight" style="color: var(--success);">500 CR</span>
+        </div>
+
+        <!-- Civic Impact Score -->
+        <div class="topbar-metric-box">
+          <span class="metric-label-micro">Civic Impact</span>
+          <span id="topbar-score-badge" class="metric-value-highlight" style="color: var(--accent-highlight);">0 PTS</span>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <button id="btn-top-sos" class="btn btn-sos btn-sm pulse" aria-label="Trigger Instant Emergency SOS" title="Instant SOS Emergency Dispatch">
+          <span class="icon">🚨</span> SOS DISPATCH
+        </button>
+        <button id="btn-demo-top" class="btn btn-outline btn-sm" aria-label="Interactive Demo Tour" title="Guided Demo Tour">
+          🎬 Demo Tour
+        </button>
+        <button id="btn-audio-toggle" class="btn btn-outline btn-sm" aria-label="Toggle Audio" title="Toggle Sound">
+          <span class="icon">🔊</span>
+        </button>
+        <button id="btn-settings-top" class="btn btn-outline btn-sm" aria-label="Accessibility Settings" title="Accessibility & Settings">
+          ⚙️ Settings
+        </button>
+        <button id="btn-reset-top" class="btn btn-outline btn-sm" aria-label="Reset Progress" title="Reset All Progress">
+          ↺ Reset
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Game Layout -->
+    <div class="main-game-layout">
+
+      <!-- Left Navigation Sidebar -->
+      <nav class="sidebar-left" role="navigation" aria-label="Game Navigation">
+        <ul class="sidebar-nav-list" role="tablist">
+          <li>
+            <button class="sidebar-nav-btn active" data-tab="map" role="tab" aria-selected="true" id="tab-btn-map">
+              <span class="nav-icon">🗺️</span> City Overview Map
+            </button>
+          </li>
+          <li>
+            <button class="sidebar-nav-btn" data-tab="inspect" role="tab" aria-selected="false" id="tab-btn-inspect">
+              <span class="nav-icon">🔍</span> Field Inspection
+            </button>
+          </li>
+          <li>
+            <button class="sidebar-nav-btn" data-tab="routes" role="tab" aria-selected="false" id="tab-btn-routes">
+              <span class="nav-icon">🚶‍♀️</span> Route Planner
+            </button>
+          </li>
+          <li>
+            <button class="sidebar-nav-btn" data-tab="evidence" role="tab" aria-selected="false" id="tab-btn-evidence">
+              <span class="nav-icon">📌</span> Evidence Board
+            </button>
+          </li>
+          <li>
+            <button class="sidebar-nav-btn" data-tab="upgrades" role="tab" aria-selected="false" id="tab-btn-upgrades">
+              <span class="nav-icon">🏗️</span> City Improvements
+            </button>
+          </li>
+          <li>
+            <button class="sidebar-nav-btn" data-tab="navigator" role="tab" aria-selected="false" id="tab-btn-navigator">
+              <span class="nav-icon">🧭</span> Safe Navigator
+            </button>
+          </li>
+          <li>
+            <button class="sidebar-nav-btn" data-tab="hazards" role="tab" aria-selected="false" id="tab-btn-hazards">
+              <span class="nav-icon">⚠️</span> Hazard Reports
+            </button>
+          </li>
+          <li>
+            <button class="sidebar-nav-btn" data-tab="journal" role="tab" aria-selected="false" id="tab-btn-journal">
+              <span class="nav-icon">📖</span> Mission Journal
+            </button>
+          </li>
+          <li>
+            <button class="sidebar-nav-btn" data-tab="sdg" role="tab" aria-selected="false" id="tab-btn-sdg">
+              <span class="nav-icon">🌐</span> SDG Field Guide
+            </button>
+          </li>
+        </ul>
+
+        <div class="sidebar-footer">
+          <div class="text-xs text-muted">
+            <strong>Hotkeys:</strong> M (Map) • I (Inspect) • R (Routes) • E (Evidence) • U (Upgrades) • N (Navigator) • H (Hazards) • J (Journal)<br>
+            Aurelia City Civic System v2.6
+          </div>
+        </div>
+      </nav>
+
+      <!-- Center Workspace Stage -->
+      <main class="center-workspace" role="main">
+
+        <!-- Tab 1: City Map View -->
+        <section id="tab-map" class="workspace-tab-panel" role="tabpanel" aria-labelledby="tab-btn-map">
+          <div class="map-view-wrapper">
+            <div class="map-header-bar">
+              <div>
+                <h2 class="view-heading">Aurelia City Tactical Overview</h2>
+                <p class="view-subtext">Click any district node or street corridor to inspect infrastructure conditions, discover clues, and plan improvements.</p>
+              </div>
+              <div id="map-live-status-bar" class="map-status-badges"></div>
+            </div>
+
+            <!-- Vector Map Stage -->
+            <div id="city-map-canvas" class="map-canvas-container" tabindex="0" aria-label="Interactive City Map of Aurelia City"></div>
+          </div>
+        </section>
+
+        <!-- Tab 2: Location Inspection -->
+        <section id="tab-inspect" class="workspace-tab-panel hidden" role="tabpanel" aria-labelledby="tab-btn-inspect">
+          <div id="inspect-view-content"></div>
+        </section>
+
+        <!-- Tab 3: Route Planner -->
+        <section id="tab-routes" class="workspace-tab-panel hidden" role="tabpanel" aria-labelledby="tab-btn-routes">
+          <div id="routes-view-content"></div>
+        </section>
+
+        <!-- Tab 4: Evidence Board -->
+        <section id="tab-evidence" class="workspace-tab-panel hidden" role="tabpanel" aria-labelledby="tab-btn-evidence">
+          <div id="evidence-view-content"></div>
+        </section>
+
+        <!-- Tab 5: City Improvements -->
+        <section id="tab-upgrades" class="workspace-tab-panel hidden" role="tabpanel" aria-labelledby="tab-btn-upgrades">
+          <div id="upgrades-view-content"></div>
+        </section>
+
+        <!-- Tab 8: Real-Time Safe Navigator -->
+        <section id="tab-navigator" class="workspace-tab-panel hidden" role="tabpanel" aria-labelledby="tab-btn-navigator">
+          <div id="navigator-view-content"></div>
+        </section>
+
+        <!-- Tab 9: Crowdsourced Hazard Reports -->
+        <section id="tab-hazards" class="workspace-tab-panel hidden" role="tabpanel" aria-labelledby="tab-btn-hazards">
+          <div id="hazards-view-content"></div>
+        </section>
+
+        <!-- Tab 6: Mission Journal -->
+        <section id="tab-journal" class="workspace-tab-panel hidden" role="tabpanel" aria-labelledby="tab-btn-journal">
+          <div id="journal-view-content"></div>
+        </section>
+
+        <!-- Tab 7: SDG Educational Guide -->
+        <section id="tab-sdg" class="workspace-tab-panel hidden" role="tabpanel" aria-labelledby="tab-btn-sdg">
+          <div id="sdg-view-content"></div>
+        </section>
+
+      </main>
+
+      <!-- Right Contextual Information Panel -->
+      <aside class="sidebar-right" id="right-context-panel" role="complementary" aria-label="Mission and Location Details"></aside>
+
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       3. FINAL CAMPAIGN ENDING SCREEN
+       ========================================================================= -->
+  <div id="view-campaign-ending" class="ending-view-container hidden">
+    <div id="campaign-ending-content"></div>
+  </div>
+
+  <!-- =========================================================================
+       4. MODALS & DIALOGS
+       ========================================================================= -->
+
+  <!-- Interactive Guided Demo Tour Modal -->
+  <div id="modal-demo-tour" class="modal-container hidden" role="dialog" aria-modal="true" aria-labelledby="modal-demo-title">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog modal-dialog-large">
+      <div class="modal-header">
+        <div>
+          <span id="demo-step-badge" class="badge badge-accent">Step 1 of 6</span>
+          <h3 id="modal-demo-title" class="modal-title mt-1">🎬 Interactive Hackathon Demo Tour</h3>
+        </div>
+        <button class="modal-close-btn modal-close" aria-label="Close modal">×</button>
+      </div>
+      <div class="modal-body">
+        <div id="demo-step-content"></div>
+      </div>
+      <div class="modal-footer" style="justify-content: space-between;">
+        <div>
+          <button id="btn-demo-prev" class="btn btn-secondary btn-sm" disabled>← Previous</button>
+          <button id="btn-demo-next" class="btn btn-primary btn-sm">Next Step →</button>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button id="btn-demo-auto-exec" class="btn btn-success btn-sm">⚡ Auto-Execute This Step</button>
+          <button class="btn btn-outline btn-sm modal-close">Exit Tour</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tutorial / How to Play Modal -->
+  <div id="modal-tutorial" class="modal-container hidden" role="dialog" aria-modal="true" aria-labelledby="modal-tut-title">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog modal-dialog-large">
+      <div class="modal-header">
+        <h3 id="modal-tut-title" class="modal-title">📖 Field Investigator's Guide & Controls</h3>
+        <button class="modal-close-btn modal-close" aria-label="Close modal">×</button>
+      </div>
+      <div class="modal-body">
+        <p>Welcome to <strong>HER SAFE ROUTE: THE SILENT SIGNAL</strong>. You are Investigator Nova, working with residents in Aurelia City to address structural safety, transportation, and public infrastructure issues.</p>
+        
+        <div class="settings-group">
+          <div>
+            <h4 class="text-accent">1. Core Philosophy: Collective Civic Responsibility</h4>
+            <p class="text-xs">Women's safety is not an individual burden. The game demonstrates that safer communities require thoughtful urban design, reliable public transit, transparent institutions, and active community care—never victim-blaming or expecting individuals to navigate hostile environments alone.</p>
+          </div>
+          <div>
+            <h4 class="text-accent">2. Investigation & Evidence Collection</h4>
+            <p class="text-xs">Explore target locations on the city map. Inspect hotspots to gather physical clues, maintenance work orders, and witness statements. Every clue exposes systemic issues.</p>
+          </div>
+          <div>
+            <h4 class="text-accent">3. Evidence Board & Deduction</h4>
+            <p class="text-xs">Connect clues on the Evidence Board to form root-cause deductions. Distinguish between systemic solutions (fixing streetlights, reforming complaint processes) and superficial distractions.</p>
+          </div>
+          <div>
+            <h4 class="text-accent">4. Route Planning & Upgrades</h4>
+            <p class="text-xs">Compare pedestrian routes for residents. Spend your municipal budget to repair streetlights, install universal curb cuts, update transit displays, and institute community help hubs. Upgrades dynamically transform route conditions on the map!</p>
+          </div>
+          <div>
+            <h4 class="text-accent">5. Scoring & Campaign Finale</h4>
+            <p class="text-xs">Each mission awards up to 100 points based on investigation thoroughness, route planning, empathetic responses, quality of improvements, and budget stewardship. Complete all three missions to earn your official Changemaker title!</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary modal-close">Got It — Begin Field Work</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Accessibility & Audio Settings Modal -->
+  <div id="modal-settings" class="modal-container hidden" role="dialog" aria-modal="true" aria-labelledby="modal-set-title">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="modal-set-title" class="modal-title">⚙️ Accessibility & Sound Settings</h3>
+        <button class="modal-close-btn modal-close" aria-label="Close modal">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="settings-group">
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-title">Sound Effects</span>
+              <span class="setting-desc">Tactile synthesized audio for clues, purchases, and UI</span>
+            </div>
+            <div class="setting-control">
+              <input type="checkbox" id="setting-sound" checked>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-title">Audio Volume</span>
+              <span class="setting-desc">Adjust master procedural audio gain</span>
+            </div>
+            <div class="setting-control">
+              <input type="range" id="setting-volume" min="0" max="1" step="0.05" value="0.4">
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-title">Reduced Motion</span>
+              <span class="setting-desc">Disable road pulse animations and transit tracers</span>
+            </div>
+            <div class="setting-control">
+              <input type="checkbox" id="setting-motion">
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-title">High Contrast Mode</span>
+              <span class="setting-desc">Enhance borders and text contrast for low vision</span>
+            </div>
+            <div class="setting-control">
+              <input type="checkbox" id="setting-contrast">
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-title">Text Size</span>
+              <span class="setting-desc">Scale UI font sizes for readability</span>
+            </div>
+            <div class="setting-control">
+              <select id="setting-text-size">
+                <option value="normal">Normal (Default)</option>
+                <option value="large">Large</option>
+                <option value="xlarge">Extra Large</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary modal-close">Save & Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clue Detail Modal -->
+  <div id="modal-clue-detail" class="modal-container hidden" role="dialog" aria-modal="true" aria-labelledby="modal-clue-title">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <span id="modal-clue-category" class="badge badge-accent">Category</span>
+          <h3 id="modal-clue-title" class="modal-title mt-2">Clue Title</h3>
+        </div>
+        <button class="modal-close-btn modal-close" aria-label="Close modal">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="text-xs text-muted">Location: <span id="modal-clue-location" class="text-main"></span></div>
+        <p id="modal-clue-body" class="mt-2"></p>
+        <div class="route-evidence-note mt-3">
+          <strong>Civic Relevance:</strong> <span id="modal-clue-relevance"></span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary modal-close">Close Dossier</button>
+        <button id="btn-clue-to-evidence" class="btn btn-primary">📌 View on Evidence Board</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mission Debrief / Scorecard Modal -->
+  <div id="modal-mission-debrief" class="modal-container hidden" role="dialog" aria-modal="true" aria-labelledby="debrief-mission-title">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="debrief-mission-title" class="modal-title">Mission Debrief</h3>
+      </div>
+      <div class="modal-body">
+        <div class="debrief-hero">
+          <div class="metric-label-micro">Mission Performance Score</div>
+          <div id="debrief-total-score" class="debrief-score-circle">-- / 100</div>
+          <div class="mt-2">
+            <span id="debrief-tier-badge" class="badge">EVALUATING</span>
+          </div>
+        </div>
+
+        <div class="debrief-score-breakdown">
+          <div class="score-row">
+            <span>Investigation & Evidence Collection:</span>
+            <strong id="score-investigation">-- / 25</strong>
+          </div>
+          <div class="score-row">
+            <span>Route Planning & Corridor Safety:</span>
+            <strong id="score-route">-- / 20</strong>
+          </div>
+          <div class="score-row">
+            <span>Empathetic & Bystander Response:</span>
+            <strong id="score-response">-- / 20</strong>
+          </div>
+          <div class="score-row">
+            <span>Quality of Municipal Upgrades:</span>
+            <strong id="score-upgrades">-- / 25</strong>
+          </div>
+          <div class="score-row">
+            <span>Budget Management:</span>
+            <strong id="score-budget">-- / 10</strong>
+          </div>
+        </div>
+
+        <div id="debrief-reward-text" class="text-center text-success font-weight-bold text-xs mt-2"></div>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-next-mission" class="btn btn-primary btn-block">
+          Proceed to Next Phase →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reset Progress Confirmation Modal -->
+  <div id="modal-reset-confirm" class="modal-container hidden" role="dialog" aria-modal="true" aria-labelledby="modal-reset-title">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="modal-reset-title" class="modal-title">↺ Reset Investigation Progress?</h3>
+        <button class="modal-close-btn modal-close" aria-label="Close modal">×</button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to reset all game progress? This will clear all discovered clues, purchased city upgrades, route decisions, and scores from your local browser storage.</p>
+        <p class="text-warning text-xs mt-2">This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary modal-close">Cancel</button>
+        <button id="btn-confirm-reset" class="btn btn-outline" style="border-color: var(--danger); color: var(--danger);">
+          Yes, Reset All Progress
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SDG Educational Info Modal -->
+  <div id="modal-sdg" class="modal-container hidden" role="dialog" aria-modal="true" aria-labelledby="modal-sdg-title">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog modal-dialog-large">
+      <div class="modal-header">
+        <h3 id="modal-sdg-title" class="modal-title">🌐 United Nations Sustainable Development Goals</h3>
+        <button class="modal-close-btn modal-close" aria-label="Close modal">×</button>
+      </div>
+      <div class="modal-body">
+        <p><strong>HER SAFE ROUTE: THE SILENT SIGNAL</strong> connects interactive gameplay directly with the United Nations 2030 Agenda for Sustainable Development:</p>
+        
+        <div class="settings-group">
+          <div>
+            <span class="badge badge-accent">SDG 5: Gender Equality</span>
+            <p class="text-xs mt-1">Target 5.2 aims to eliminate all forms of violence against all women and girls in public and private spheres. Safe, accessible public transit and pedestrian routes are prerequisites for women's equal participation in education, work, and public life.</p>
+          </div>
+          <div>
+            <span class="badge badge-accent">SDG 11: Sustainable Cities & Communities</span>
+            <p class="text-xs mt-1">Target 11.2 & 11.7 focus on providing safe, accessible transport and inclusive public green spaces, paying special attention to women, children, people with disabilities, and older persons.</p>
+          </div>
+          <div>
+            <span class="badge badge-accent">SDG 16: Peace, Justice & Strong Institutions</span>
+            <p class="text-xs mt-1">Target 16.6 develops effective, accountable, and transparent institutions. Mission 2 illustrates how bureaucratic silence and broken complaint processes undermine community safety.</p>
+          </div>
+          <div>
+            <span class="badge badge-accent">SDG 10: Reduced Inequalities</span>
+            <p class="text-xs mt-1">Target 10.2 promotes social and economic inclusion of all through Universal Design—the principle that designing for disability and vulnerability creates a safer city for everyone.</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary modal-close">Return to Game</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Instant SOS Emergency Dispatch Modal -->
+  <div id="modal-sos-dispatch" class="modal-container hidden" role="dialog" aria-modal="true" aria-labelledby="modal-sos-title">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog modal-dialog-large sos-modal-dialog">
+      <div class="modal-header sos-modal-header">
+        <div class="d-flex items-center gap-2">
+          <span class="sos-icon-pulse">🚨</span>
+          <div>
+            <h3 id="modal-sos-title" class="modal-title" style="color: var(--danger);">EMERGENCY SOS DISPATCH</h3>
+            <span class="text-xs text-muted">Aurelia Rapid Mutual-Aid & Campus Escort Network</span>
+          </div>
+        </div>
+        <button class="modal-close-btn modal-close" aria-label="Close modal">×</button>
+      </div>
+      
+      <div class="modal-body">
+        <!-- Countdown Container -->
+        <div id="sos-countdown-view" class="sos-countdown-card text-center">
+          <div class="sos-countdown-number" id="sos-countdown-timer">3</div>
+          <div class="sos-countdown-label">Sending high-priority distress broadcast in <span id="sos-countdown-sec">3</span> seconds...</div>
+          <p class="text-xs text-muted mt-2">Cancel immediately if triggered accidentally.</p>
+          <div class="mt-3">
+            <button id="btn-sos-abort" class="btn btn-secondary btn-sm">Cancel Countdown</button>
+          </div>
+        </div>
+
+        <!-- Active Dispatch Telemetry View -->
+        <div id="sos-active-view" class="sos-active-card hidden">
+          <div class="sos-status-banner">
+            <div class="status-pulse-dot"></div>
+            <div>
+              <strong style="color: #ff6b6b; font-size: 1.05rem;">SOS TELEMETRY ACTIVATED</strong>
+              <div class="text-xs text-muted" id="sos-dispatch-timestamp">Dispatched at 00:00:00</div>
+            </div>
+          </div>
+
+          <div class="sos-telemetry-grid mt-3">
+            <div class="telemetry-box">
+              <span class="metric-label-micro">GPS Pin</span>
+              <strong id="sos-telemetry-loc">Aurelia University East Gate</strong>
+            </div>
+            <div class="telemetry-box">
+              <span class="metric-label-micro">Trusted Guardians</span>
+              <strong style="color: var(--success);">3 Contacts Alerted (SMS + Live Beacon)</strong>
+            </div>
+            <div class="telemetry-box">
+              <span class="metric-label-micro">Campus Safety Escort</span>
+              <strong style="color: var(--accent-secondary);">Unit En Route (ETA ~3 mins)</strong>
+            </div>
+            <div class="telemetry-box">
+              <span class="metric-label-micro">Audio Deterrent</span>
+              <strong id="sos-siren-status-text" style="color: var(--text-muted);">Siren Inactive</strong>
+            </div>
+          </div>
+
+          <!-- SOS Action Bar -->
+          <div class="sos-controls-row mt-4">
+            <button id="btn-sos-siren-toggle" class="btn btn-outline btn-sm">
+              <span class="icon">🔊</span> Sound Audio Deterrent (Siren)
+            </button>
+            <button id="btn-sos-covert-toggle" class="btn btn-secondary btn-sm" title="Discreet screen disguise">
+              <span class="icon">🕶️</span> Covert Stealth Mode
+            </button>
+            <button id="btn-sos-cancel-active" class="btn btn-outline btn-sm" style="border-color: rgba(255, 99, 132, 0.5); color: #ff6b6b;">
+              <span class="icon">🛑</span> End SOS Alert
+            </button>
+          </div>
+
+          <!-- Verified 24/7 Safe Havens -->
+          <div class="mt-4">
+            <h4 class="section-title text-sm mb-2" style="color: var(--accent-secondary);">
+              🛡️ Nearest Verified 24/7 Safe Havens (Walk-In Shelters)
+            </h4>
+            <div id="sos-safe-havens-list" class="safe-havens-grid"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer" style="justify-content: space-between;">
+        <span class="text-xs text-muted">Zero-data storage • Encrypted client-side signal • Never victim-blaming</span>
+        <button class="btn btn-secondary modal-close">Dismiss Window</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Crowdsourced Hazard Reporting Modal -->
+  <div id="modal-report-hazard" class="modal-container hidden" role="dialog" aria-modal="true" aria-labelledby="modal-report-title">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <h3 id="modal-report-title" class="modal-title">⚠️ Report Danger or Infrastructure Hazard</h3>
+          <span class="text-xs text-muted">Empower Aurelia commuters and hold municipal maintenance accountable</span>
+        </div>
+        <button class="modal-close-btn modal-close" aria-label="Close modal">×</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="form-report-hazard" onsubmit="return false;">
+          <div class="form-group mb-3">
+            <label class="form-label" for="hazard-form-location">Corridor / Location</label>
+            <select id="hazard-form-location" class="form-select" required></select>
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-label" for="hazard-form-category">Hazard Category</label>
+            <select id="hazard-form-category" class="form-select" required>
+              <option value="unlit_corridor">💡 Unlit Corridor / Dead Streetlight</option>
+              <option value="broken_curb">♿ Broken Sidewalk / Inaccessible Curb</option>
+              <option value="ghost_schedule">🚌 Transit Ghosting / Cancelled Service</option>
+              <option value="isolated_tunnel">🚇 Blind Corner / Isolated Sub-Passage</option>
+              <option value="infrastructure">🚨 Broken Emergency Pillar / Callbox</option>
+            </select>
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-label" for="hazard-form-severity">Urgency & Severity</label>
+            <select id="hazard-form-severity" class="form-select" required>
+              <option value="critical">🚨 Critical Danger (Immediate safety threat / impassable)</option>
+              <option value="high" selected>⚠️ High (Severe impediment / stressful night corridor)</option>
+              <option value="moderate">ℹ️ Moderate (Maintenance delay / partial obstruction)</option>
+            </select>
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-label" for="hazard-form-title">Hazard Summary</label>
+            <input type="text" id="hazard-form-title" class="form-input" placeholder="e.g. Broken streetlight on corner of 4th Ave" required maxlength="80">
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-label" for="hazard-form-desc">Detailed Commuter Advisory</label>
+            <textarea id="hazard-form-desc" class="form-textarea" rows="3" placeholder="Describe the safety hazard and safe detours or warnings for women commuting alone..." required maxlength="300"></textarea>
+          </div>
+
+          <div class="form-check mb-2">
+            <label class="d-flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" id="hazard-form-anon" checked>
+              <span class="text-xs">Post anonymously (do not publish investigator handle)</span>
+            </label>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary modal-close">Cancel</button>
+        <button id="btn-submit-hazard-report" class="btn btn-primary">
+          <span class="icon">📢</span> Publish Civic Hazard Report
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Covert Stealth Screen Disguise Overlay -->
+  <div id="covert-stealth-screen" class="covert-screen hidden" role="region" aria-label="Covert Disguise Screen">
+    <div class="covert-topbar">
+      <div class="covert-course-info">
+        <span class="course-code">ECON 204</span> • <span class="course-name">Urban Economics & Regional Policy</span> • Fall 2026
+      </div>
+      <button id="btn-covert-exit" class="btn-covert-exit" title="Exit stealth mode">
+        Return to App ✕
+      </button>
+    </div>
+    
+    <div class="covert-content-area" id="covert-tap-zone">
+      <h2 class="covert-title">Lecture 9: Transit Accessibility & Housing Densities</h2>
+      <p class="covert-timestamp">Notes updated Oct 27, 2026 • 21:40</p>
+
+      <div class="covert-notes-section">
+        <h3>1. Alonso-Muth-Mills Urban Spatial Model</h3>
+        <p>The standard monocentric city model posits that households trade off commuting costs against land prices. When transit networks experience chronic delays or service deficits, the marginal bid rent gradient shifts disproportionately, affecting peripheral wage workers.</p>
+        
+        <h3>2. Pedestrian Catchment Radii</h3>
+        <ul>
+          <li>Standard transit-oriented development (TOD) assumes an 800-meter (10-minute) walking radius to rail nodes.</li>
+          <li>Micro-accessibility barriers (unramped curbs, unlit crosswalks) effectively reduce pedestrian catchment areas by up to 45% for mobility-restricted populations.</li>
+          <li>First-mile / last-mile safety deficits create artificial transit deserts even within high-density municipal cores.</li>
+        </ul>
+
+        <h3>3. Municipal Capital Allocation Strategies</h3>
+        <p>Public infrastructure investments in active pedestrian corridors yield an estimated 3.8x return in economic vitality and social capital retention over 10-year horizons.</p>
+      </div>
+
+      <div class="covert-footnote">
+        <small>Tap header or click button in upper right corner to exit covert mode.</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- JavaScript Code Modules -->
+  <script src="audio.js"></script>
+  <script src="gameData.js"></script>
+  <script src="gameEngine.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
