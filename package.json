@@ -1,0 +1,19 @@
+{
+  "name": "her-safe-route",
+  "version": "1.0.0",
+  "description": "Her Safe Route: The Silent Signal - 10-level social awareness browser game",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test-comprehensive.js"
+  },
+  "keywords": [
+    "game",
+    "womens-safety",
+    "social-good",
+    "educational",
+    "silent-signal"
+  ],
+  "author": "jayashreeupadhya08-ctrl",
+  "license": "MIT"
+}

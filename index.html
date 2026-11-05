@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Her Safe Route: The Silent Signal</title>
+  <meta name="description" content="An interactive indie browser game promoting women's safety, public-space awareness, and community responsibility in a nighttime Indian neighborhood.">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <script>
+    // Unregister any rogue Service Workers from other localhost projects
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for (let registration of registrations) {
+          registration.unregister();
+        }
+      });
+    }
+  </script>
+  <link rel="stylesheet" href="style.css?v=10.0_campaign">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Atmospheric Screen Glow Elements -->
+  <div class="ambient-glow glow-teal" aria-hidden="true"></div>
+  <div class="ambient-glow glow-purple" aria-hidden="true"></div>
+
+  <!-- Header / Navigation & Accessibility Controls -->
+  <header class="app-header" role="banner">
+    <div class="header-brand">
+      <div class="brand-badge">
+        <span class="signal-icon" aria-hidden="true">🛡️</span>
+        <span class="live-pulse" aria-hidden="true"></span>
+      </div>
+      <div>
+        <h1 class="brand-title">HER SAFE ROUTE</h1>
+        <p class="brand-subtitle">THE SILENT SIGNAL • COMMUNITY SAFETY ADVENTURE</p>
+      </div>
+    </div>
+
+    <!-- Quick Utility Controls -->
+    <div class="header-controls" role="toolbar" aria-label="Game controls">
+      <button id="btn-audio" class="control-btn" aria-label="Toggle sound" title="Toggle Sound (Press M)">
+        <span class="btn-icon" id="audio-icon">🔊</span>
+        <span class="btn-label">Audio On</span>
+      </button>
+      <button id="btn-contrast" class="control-btn" aria-label="Toggle High Contrast Mode" title="High Contrast Mode">
+        <span class="btn-icon">👁️</span>
+        <span class="btn-label">High Contrast</span>
+      </button>
+      <button id="btn-signal-guide" class="control-btn highlight-btn" aria-label="Learn the Silent Signal" title="What is the Silent Signal?">
+        <span class="btn-icon">✋</span>
+        <span class="btn-label">Silent Signal</span>
+      </button>
+      <button id="btn-help" class="control-btn" aria-label="How to play and keyboard shortcuts" title="Help &amp; Keys (Press H)">
+        <span class="btn-icon">❓</span>
+        <span class="btn-label">Help</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Game Container -->
+  <main id="game-app" class="game-viewport">
+
+    <!-- ==============================================
+         SCREEN 1: HOME SCREEN
+         ============================================== -->
+    <section id="screen-home" class="screen active" aria-labelledby="home-hero-title">
+      <div class="home-hero-container">
+        <div class="home-card glass-panel">
+          <div class="home-tag">
+            <span class="tag-dot"></span> NIGHTTIME URBAN SAFETY INITIATIVE
+          </div>
+          <h2 id="home-hero-title" class="home-title">
+            Transform Shadows Into <span class="text-gradient">Safe Sanctuaries</span>
+          </h2>
+          <p class="home-synopsis">
+            It is <strong>9:30 PM</strong> in <em>Anand Nagar</em>. Priya, a 21-year-old student, is returning home across the neighborhood. Unlit alleys, shuttered street fronts, and isolated transit stops make her route tense.
+          </p>
+          <p class="home-philosophy">
+            <strong>Safety is not about telling women to stay indoors.</strong> It is about reimagining public spaces, activating <span class="highlight-teal">"eyes on the street"</span>, building bystander intervention networks, and introducing the life-saving <span class="highlight-purple">Universal Silent Signal</span>.
+          </p>
+
+          <div class="home-highlights-grid">
+            <div class="highlight-card">
+              <div class="hl-icon">💡</div>
+              <div class="hl-content">
+                <h4>10 Real Urban Levels</h4>
+                <p>Address unlit lanes, subways, bus stops, bazaars, parks, metro hubs, and feeder routes.</p>
+              </div>
+            </div>
+            <div class="highlight-card">
+              <div class="hl-icon">🏙️</div>
+              <div class="hl-content">
+                <h4>Dynamic City Transformation</h4>
+                <p>Watch the interactive 2D city physically light up and evolve with every choice.</p>
+              </div>
+            </div>
+            <div class="highlight-card">
+              <div class="hl-icon">🤝</div>
+              <div class="hl-content">
+                <h4>Community Impact</h4>
+                <p>Earn up to 100 Safety Points across 10 progressive urban community levels.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="home-actions">
+            <button id="btn-start-journey" class="btn-primary pulse-action" autofocus>
+              <span class="btn-icon-left">🚶‍♀️</span> Start Priya's Journey <span class="btn-arrow">→</span>
+            </button>
+            <button id="btn-quick-rules" class="btn-secondary">
+              <span>📖</span> How To Play
+            </button>
+          </div>
+
+          <div class="home-footer-strip">
+            <span>⌨️ Keyboard Friendly: [1, 2, 3] Choose • [Space/Enter] Proceed • [M] Mute</span>
+            <span class="helpline-hint">🇮🇳 Real Emergency Helplines: <strong>112</strong> / <strong>1091</strong></span>
+          </div>
+        </div>
+
+        <!-- Right Side Visual Teaser -->
+        <div class="home-visual-card glass-panel" aria-hidden="true">
+          <div class="city-teaser-illustration">
+            <div class="teaser-sky">
+              <div class="moon"></div>
+              <div class="stars-cluster"></div>
+            </div>
+            <div class="teaser-skyline"></div>
+            <div class="teaser-street">
+              <div class="teaser-lamp lamp-left"></div>
+              <div class="teaser-auto"></div>
+              <div class="teaser-avatar"></div>
+              <div class="teaser-lamp lamp-right"></div>
+            </div>
+            <div class="teaser-badge">
+              <span class="badge-icon">📍</span>
+              <span>Anand Nagar Ward 14 • 1.8 km to Home</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==============================================
+         SCREEN 2: MAIN GAMEPLAY & INTERACTIVE MAP VIEW
+         ============================================== -->
+    <section id="screen-game" class="screen" aria-label="Game Route and Mission Area">
+      
+      <!-- Top HUD Bar -->
+      <div class="game-hud glass-panel" role="region" aria-label="Safety status metrics">
+        <div class="hud-item hud-mission">
+          <span class="hud-label">CURRENT CHECKPOINT</span>
+          <div class="hud-mission-name">
+            <span id="hud-mission-number" class="badge-num">1/10</span>
+            <span id="hud-mission-title">Level 1: The Dark Street (Gali No. 4)</span>
+          </div>
+        </div>
+
+        <div class="hud-item hud-progress">
+          <div class="hud-meter-header">
+            <span class="hud-label">ROUTE PROGRESS</span>
+            <span id="hud-progress-text" class="hud-value">10%</span>
+          </div>
+          <div class="meter-bar-track">
+            <div id="hud-progress-fill" class="meter-bar-fill progress-fill" style="width: 10%;"></div>
+          </div>
+        </div>
+
+        <div class="hud-item hud-safety">
+          <div class="hud-meter-header">
+            <span class="hud-label">CITY SAFETY INDEX</span>
+            <span id="hud-safety-text" class="hud-value highlight-teal">0 / 100 PTS</span>
+          </div>
+          <div class="meter-bar-track">
+            <div id="hud-safety-fill" class="meter-bar-fill safety-fill" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <div class="hud-item hud-status">
+          <span class="hud-label">NEIGHBORHOOD VIGILANCE</span>
+          <div id="hud-vigilance-badge" class="status-pill status-isolated">
+            <span class="status-dot"></span>
+            <span id="hud-vigilance-text">Isolated</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Game Split Layout: Interactive Map on Left/Top, Story & Decisions on Right/Bottom -->
+      <div class="game-layout">
+
+        <!-- LEFT COLUMN: INTERACTIVE 2D CITY MAP -->
+        <div class="city-map-container glass-panel">
+          <div class="map-header">
+            <div class="map-title-wrap">
+              <span class="map-icon">🗺️</span>
+              <div>
+                <h3 class="map-heading">Interactive Route Map: Anand Nagar</h3>
+                <span class="map-subheading">Click any checkpoint to inspect urban safety features</span>
+              </div>
+            </div>
+            <div class="map-view-controls">
+              <button id="btn-toggle-view" class="map-toggle-btn" title="Toggle between daytime/night illumination preview">
+                <span class="toggle-icon">✨</span>
+                <span id="toggle-view-text">Preview Full Illumination</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Canvas Neighborhood Graphic -->
+          <div class="canvas-wrapper">
+            <canvas id="city-canvas" width="900" height="520" aria-label="Interactive 2D map of Anand Nagar showing Priya walking along checkpoints"></canvas>
+            
+            <!-- Quick Legend overlay -->
+            <div class="map-legend" aria-hidden="true">
+              <span class="legend-item"><span class="legend-swatch swatch-current"></span> Priya's Location</span>
+              <span class="legend-item"><span class="legend-swatch swatch-safe"></span> Transformed Safe Zone</span>
+              <span class="legend-item"><span class="legend-swatch swatch-dark"></span> Dark Spot</span>
+              <span class="legend-item"><span class="legend-swatch swatch-dest"></span> Destination (Home)</span>
+            </div>
+          </div>
+
+          <!-- Checkpoint Progress Breadcrumbs: 10 Levels -->
+          <nav class="checkpoint-timeline" aria-label="Checkpoints timeline">
+            <button class="checkpoint-step active" data-step="0" aria-label="Level 1: Dark Street">
+              <span class="step-num">1</span>
+              <span class="step-label">Dark Street</span>
+              <span class="step-status">Active</span>
+            </button>
+            <div class="step-connector"></div>
+            <button class="checkpoint-step" data-step="1" aria-label="Level 2: Subway Underpass">
+              <span class="step-num">2</span>
+              <span class="step-label">Subway</span>
+              <span class="step-status">Pending</span>
+            </button>
+            <div class="step-connector"></div>
+            <button class="checkpoint-step" data-step="2" aria-label="Level 3: Bus Stop">
+              <span class="step-num">3</span>
+              <span class="step-label">Bus Shelter</span>
+              <span class="step-status">Pending</span>
+            </button>
+            <div class="step-connector"></div>
+            <button class="checkpoint-step" data-step="3" aria-label="Level 4: Closed Market">
+              <span class="step-num">4</span>
+              <span class="step-label">Main Bazaar</span>
+              <span class="step-status">Pending</span>
+            </button>
+            <div class="step-connector"></div>
+            <button class="checkpoint-step" data-step="4" aria-label="Level 5: City Park">
+              <span class="step-num">5</span>
+              <span class="step-label">City Park</span>
+              <span class="step-status">Pending</span>
+            </button>
+            <div class="step-connector"></div>
+            <button class="checkpoint-step" data-step="5" aria-label="Level 6: Metro Auto Hub">
+              <span class="step-num">6</span>
+              <span class="step-label">Metro Hub</span>
+              <span class="step-status">Pending</span>
+            </button>
+            <div class="step-connector"></div>
+            <button class="checkpoint-step" data-step="6" aria-label="Level 7: Feeder Route">
+              <span class="step-num">7</span>
+              <span class="step-label">E-Rickshaw</span>
+              <span class="step-status">Pending</span>
+            </button>
+            <div class="step-connector"></div>
+            <button class="checkpoint-step" data-step="7" aria-label="Level 8: Street Corner">
+              <span class="step-num">8</span>
+              <span class="step-label">Corner Hub</span>
+              <span class="step-status">Pending</span>
+            </button>
+            <div class="step-connector"></div>
+            <button class="checkpoint-step" data-step="8" aria-label="Level 9: Plaza Signal">
+              <span class="step-num">9</span>
+              <span class="step-label">Plaza Alert</span>
+              <span class="step-status">Pending</span>
+            </button>
+            <div class="step-connector"></div>
+            <button class="checkpoint-step" data-step="9" aria-label="Level 10: Home Haven">
+              <span class="step-num">10</span>
+              <span class="step-label">Home Haven</span>
+              <span class="step-status">Pending</span>
+            </button>
+          </nav>
+        </div>
+
+        <!-- RIGHT COLUMN: NARRATIVE MISSION & DECISION SYSTEM -->
+        <div class="mission-panel glass-panel" aria-live="polite">
+          
+          <!-- Mission Header & Context -->
+          <div class="mission-header">
+            <div class="mission-meta">
+              <span id="mission-badge" class="badge-mission">LEVEL 1 OF 10</span>
+              <span id="mission-time" class="mission-timestamp">🕒 09:30 PM • Gali No. 4</span>
+            </div>
+            <h3 id="mission-title" class="mission-title">The Shadowed Alley</h3>
+          </div>
+
+          <!-- Scene Narrative & Environment Card -->
+          <div class="scene-narrative-box">
+            <div class="scene-character-badge">
+              <div class="char-avatar">👩</div>
+              <div class="char-meta">
+                <span class="char-name">Priya's Inner Monologue</span>
+                <span class="char-mood" id="char-mood">Uneasy • Walking alone</span>
+              </div>
+            </div>
+            <p id="mission-narrative" class="mission-narrative-text">
+              Loading scenario description...
+            </p>
+            <div class="scene-hazard-note" id="scene-hazard-alert">
+              <span class="alert-icon">⚠️</span>
+              <span id="scene-hazard-text">Urban Vulnerability: 3 streetlights burned out, zero pedestrian footfall, sharp blind turn ahead.</span>
+            </div>
+          </div>
+
+          <!-- Decision Options Container -->
+          <div class="decision-container" id="decision-container">
+            <h4 class="decision-prompt">What should Priya and the community do? <span class="kbd-hint">(Press 1, 2, or 3)</span></h4>
+            
+            <div class="options-list" id="options-list" role="radiogroup" aria-label="Safety decision options">
+              <!-- Dynamically populated by game.js -->
+            </div>
+          </div>
+
+          <!-- Immediate Feedback State (Hidden by default, shown after decision) -->
+          <div class="feedback-container hidden" id="feedback-container">
+            <div class="feedback-card" id="feedback-card">
+              <div class="feedback-badge-row">
+                <span id="feedback-badge" class="feedback-score-pill">+20 PTS</span>
+                <span id="feedback-type" class="feedback-type-pill">SYSTEMIC URBAN FIX</span>
+              </div>
+              <h4 id="feedback-heading" class="feedback-heading">Transformative Community Solution!</h4>
+              <p id="feedback-explanation" class="feedback-explanation">
+                Detailed educational rationale and real-world urban safety principle explained here.
+              </p>
+              
+              <!-- City Transformation Notification -->
+              <div class="transformation-alert" id="transformation-alert">
+                <span class="trans-sparkle">✨</span>
+                <div>
+                  <strong>City Transformed:</strong>
+                  <span id="trans-description">Broken sodium lamps replaced with high-lumen solar LEDs and blind corner mirrors.</span>
+                </div>
+              </div>
+
+              <div class="feedback-action-row">
+                <button id="btn-next-mission" class="btn-primary" autofocus>
+                  <span>Continue Journey</span> <span class="btn-arrow">→</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==============================================
+         SCREEN 3: FINAL RESULTS & TRANSFORMATION REPORT
+         ============================================== -->
+    <section id="screen-results" class="screen" aria-labelledby="results-title">
+      <div class="results-container">
+        <div class="results-card glass-panel">
+          
+          <!-- Results Hero -->
+          <div class="results-header">
+            <div class="victory-icon-circle">
+              <span id="results-icon">🏆</span>
+            </div>
+            <div class="results-badge">JOURNEY COMPLETE • SAFELY HOME</div>
+            <h2 id="results-title" class="results-title">Priya Reached Home Safely</h2>
+            <p class="results-subtitle">
+              Through your decisions, <strong>Anand Nagar</strong> has evolved from an intimidating corridor into an illuminated, connected, and watchful neighborhood.
+            </p>
+          </div>
+
+          <!-- Score Card & Rank -->
+          <div class="score-showcase">
+            <div class="score-box">
+              <span class="score-label">TOTAL SAFETY & COMMUNITY SCORE</span>
+              <div class="score-number-row">
+                <span id="final-score" class="big-score">95</span>
+                <span class="max-score">/ 100</span>
+              </div>
+              <div id="final-rank-badge" class="rank-badge">COMMUNITY GUARDIAN</div>
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-cell">
+                <span class="stat-icon">💡</span>
+                <div class="stat-meta">
+                  <span class="stat-val" id="stat-lighting">100%</span>
+                  <span class="stat-lbl">Street Illumination</span>
+                </div>
+              </div>
+              <div class="stat-cell">
+                <span class="stat-icon">👁️</span>
+                <div class="stat-meta">
+                  <span class="stat-val" id="stat-surveillance">Active</span>
+                  <span class="stat-lbl">Natural Surveillance</span>
+                </div>
+              </div>
+              <div class="stat-cell">
+                <span class="stat-icon">🚌</span>
+                <div class="stat-meta">
+                  <span class="stat-val" id="stat-transit">Smart SOS</span>
+                  <span class="stat-lbl">Transit Security</span>
+                </div>
+              </div>
+              <div class="stat-cell">
+                <span class="stat-icon">✋</span>
+                <div class="stat-meta">
+                  <span class="stat-val" id="stat-signal">Active</span>
+                  <span class="stat-lbl">Silent Signal Network</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- City Improvement Report Card -->
+          <div class="report-section">
+            <h3 class="section-title">
+              <span>📋</span> City Transformation Report Card
+            </h3>
+            <p class="section-desc">
+              Here is how your choices upgraded urban infrastructure and community vigilance:
+            </p>
+            <div class="report-grid" id="report-grid">
+              <!-- Dynamically populated with all 5 mission outcomes -->
+            </div>
+          </div>
+
+          <!-- Educational Feature: The Universal Silent Signal Interactive Trainer -->
+          <div class="signal-feature-box">
+            <div class="signal-feature-header">
+              <div class="signal-tag">LIFE-SAVING INTERACTIVE PROTOCOL</div>
+              <h3>The Universal Silent Signal for Help</h3>
+              <p>Recognized globally, this three-step discrete hand gesture allows anyone to signal danger without speaking or alerting an aggressor. <strong>Click each step below to practice:</strong></p>
+            </div>
+            
+            <div class="interactive-signal-trainer" id="signal-trainer-main">
+              <div class="trainer-visual-display">
+                <div class="trainer-hand-icon" id="trainer-hand-display">✋</div>
+                <div class="trainer-status" id="trainer-status-text">Step 1: Open Palm (Facing Outward)</div>
+              </div>
+              <div class="trainer-step-buttons">
+                <button class="step-train-btn active" data-step="1">
+                  <span class="step-train-icon">✋</span>
+                  <span class="step-train-title">1. Palm Out</span>
+                </button>
+                <button class="step-train-btn" data-step="2">
+                  <span class="step-train-icon">✊</span>
+                  <span class="step-train-title">2. Tuck Thumb</span>
+                </button>
+                <button class="step-train-btn" data-step="3">
+                  <span class="step-train-icon">👊</span>
+                  <span class="step-train-title">3. Fold Fingers</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="signal-steps-row">
+              <div class="signal-step-card" id="card-step-1">
+                <div class="step-gesture-art">✋</div>
+                <div class="step-badge">STEP 1</div>
+                <h5>Palm Facing Out</h5>
+                <p>Raise open hand facing toward camera, friend, or public bystander.</p>
+              </div>
+              <div class="signal-arrow">➔</div>
+              <div class="signal-step-card" id="card-step-2">
+                <div class="step-gesture-art">✊</div>
+                <div class="step-badge">STEP 2</div>
+                <h5>Tuck Thumb In</h5>
+                <p>Fold your thumb into the center of your open palm.</p>
+              </div>
+              <div class="signal-arrow">➔</div>
+              <div class="signal-step-card highlight-step" id="card-step-3">
+                <div class="step-gesture-art">👊</div>
+                <div class="step-badge">STEP 3</div>
+                <h5>Fold Fingers Over</h5>
+                <p>Close your four fingers over your thumb, trapping it discretely.</p>
+              </div>
+            </div>
+            <div class="bystander-tip">
+              <strong>💡 If you see this signal:</strong> Do not shout or escalate. Maintain eye contact, discretely check in (e.g. <em>"Can I help you find something?"</em>), call <strong>112</strong> or <strong>1091</strong>, or inform a nearby certified safe store keeper.
+            </div>
+          </div>
+
+          <!-- Real World Safety Helplines -->
+          <div class="helplines-box">
+            <h4>🇮🇳 Essential Women Safety Helplines &amp; Emergency Numbers</h4>
+            <div class="helpline-chips">
+              <div class="chip"><strong>112</strong> National Emergency Support System</div>
+              <div class="chip"><strong>1091</strong> Women in Distress Helpline</div>
+              <div class="chip"><strong>181</strong> Women Helpline (Domestic/Crisis)</div>
+              <div class="chip"><strong>1090</strong> Women Powerline</div>
+              <div class="chip"><strong>112 Mobile App</strong> SOS Direct Police Dispatch</div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="results-actions">
+            <button id="btn-replay" class="btn-primary">
+              <span>🔄</span> Play Again (Try Different Strategies)
+            </button>
+            <button id="btn-view-city" class="btn-secondary">
+              <span>🏙️</span> Inspect Transformed City Map
+            </button>
+            <button id="btn-copy-report" class="btn-secondary">
+              <span>📋</span> Copy Safety Report &amp; Helplines
+            </button>
+            <button id="btn-print-cert" class="btn-secondary">
+              <span>🖨️</span> Save / Print Certificate
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==============================================
+       MODALS: HELP, SILENT SIGNAL GUIDE, LOCATION INSPECT
+       ============================================== -->
+  
+  <!-- Modal 1: How to Play & Accessibility Help -->
+  <div id="modal-help" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-help-title">
+    <div class="modal-card glass-panel">
+      <div class="modal-header">
+        <h3 id="modal-help-title">How To Play &amp; Accessibility</h3>
+        <button class="modal-close" id="btn-close-help" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h4>Objective</h4>
+        <p>Guide Priya through 5 critical urban checkpoints on her route home. Your decisions determine whether the city remains dark and passive or transforms into an illuminated, community-protected environment.</p>
+
+        <h4>Controls &amp; Keyboard Shortcuts</h4>
+        <ul class="modal-list">
+          <li><kbd>1</kbd>, <kbd>2</kbd>, <kbd>3</kbd> : Select Decision Options A, B, or C</li>
+          <li><kbd>Space</kbd> or <kbd>Enter</kbd> : Confirm choice or advance to next mission</li>
+          <li><kbd>M</kbd> : Toggle audio background music and sound effects</li>
+          <li><kbd>H</kbd> : Open this Help window</li>
+          <li><kbd>Esc</kbd> : Close open modal dialogue</li>
+        </ul>
+
+        <h4>Scoring System</h4>
+        <p>Decisions that implement <strong>systemic urban improvements</strong> and <strong>community solidarity</strong> award the maximum <strong>20 points per mission</strong> (total 100). Passive or isolationist choices yield fewer points and highlight urban safety challenges.</p>
+
+        <h4>Accessibility Features</h4>
+        <p>Supports High Contrast mode, screen-reader semantic landmarks, keyboard focus management, and audible feedback toggles.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary modal-btn-close" id="btn-ack-help">Got It</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Silent Signal Full Guide -->
+  <div id="modal-signal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-signal-title">
+    <div class="modal-card glass-panel">
+      <div class="modal-header">
+        <h3 id="modal-signal-title">The Silent Signal Protocol</h3>
+        <button class="modal-close" id="btn-close-signal" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="interactive-signal-trainer" id="signal-trainer-modal">
+          <div class="trainer-visual-display">
+            <div class="trainer-hand-icon" id="trainer-modal-hand">✋</div>
+            <div class="trainer-status" id="trainer-modal-status">Step 1: Open Palm (Facing Outward)</div>
+          </div>
+          <div class="trainer-step-buttons">
+            <button class="step-train-btn active" data-target="modal" data-step="1">
+              <span class="step-train-icon">✋</span>
+              <span class="step-train-title">1. Palm Out</span>
+            </button>
+            <button class="step-train-btn" data-target="modal" data-step="2">
+              <span class="step-train-icon">✊</span>
+              <span class="step-train-title">2. Tuck Thumb</span>
+            </button>
+            <button class="step-train-btn" data-target="modal" data-step="3">
+              <span class="step-train-icon">👊</span>
+              <span class="step-train-title">3. Fold Fingers</span>
+            </button>
+          </div>
+        </div>
+        <h4>What is the Silent Signal?</h4>
+        <p>The <strong>Signal for Help</strong> is a single-handed gesture that can be shown discretely over video calls, through a window, or to a bystander on the street without leaving any digital trace or escalating immediate danger.</p>
+
+        <h4>How To Execute It:</h4>
+        <ol class="modal-list ordered">
+          <li><strong>Hold up hand:</strong> Palm facing outward toward the person you are alerting.</li>
+          <li><strong>Tuck thumb:</strong> Fold your thumb inward across your palm.</li>
+          <li><strong>Trap fingers:</strong> Close your other four fingers down over your thumb to trap it.</li>
+        </ol>
+
+        <h4>The 5 D's of Active Bystander Intervention:</h4>
+        <ul class="modal-list">
+          <li><strong>Distract:</strong> De-escalate by asking a casual question (<em>"Do you know when the next bus comes?"</em>).</li>
+          <li><strong>Delegate:</strong> Alert an authority figure, shopkeeper, or transit marshal.</li>
+          <li><strong>Document:</strong> Keep a safe distance, take notes or verify location for emergency services.</li>
+          <li><strong>Delay:</strong> Check in on the person after the situation has diffused.</li>
+          <li><strong>Direct:</strong> Intervene only if it is completely safe to do so.</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary modal-btn-close" id="btn-ack-signal">Understood</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Location Inspector Modal (Click on map checkpoint) -->
+  <div id="modal-inspect" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-inspect-title">
+    <div class="modal-card glass-panel">
+      <div class="modal-header">
+        <h3 id="modal-inspect-title">Checkpoint Inspection</h3>
+        <button class="modal-close" id="btn-close-inspect" aria-label="Close inspection">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-inspect-content">
+        <!-- Filled dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" id="btn-ack-inspect">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- JavaScript Modules with Cache Busting -->
+  <script src="audio.js?v=10.0_campaign"></script>
+  <script src="city-canvas.js?v=10.0_campaign"></script>
+  <script src="game.js?v=10.0_campaign"></script>
+</body>
+</html>
